@@ -120,13 +120,13 @@ export function setLocalNotification() {
           // console.log("Notification permissions granted.");
           Notifications.cancelAllScheduledNotificationsAsync();
           const localNotification = {
-            title: "Test notification",
-            body: "Test notification body"
+            title: "Remember to do Quiz today",
+            body: "Remember to do Quiz today"
           };
 
           const schedulingOptions = {
             time: new Date().getTime() + 1000,
-            repeat: "hour"
+            repeat: "day"
           };
 
           Notifications.scheduleLocalNotificationAsync(
