@@ -2,7 +2,7 @@ import { View, StyleSheet, SafeAreaView, FlatList, Alert } from "react-native";
 import React from "react";
 import { connect } from "react-redux";
 import { Text, Input, Icon, Button } from "react-native-elements";
-import { handleAddNewDeck } from "../actions/shared";
+import { handleAddNewDeck, returnFormattedDeck } from "../actions/shared";
 
 class AddNewDeckScreen extends React.Component {
   constructor(props) {
@@ -27,7 +27,7 @@ class AddNewDeckScreen extends React.Component {
       });
       //dispatch new deck and route to Home
       this.props.dispatch(handleAddNewDeck(title, description));
-      this.props.navigation.navigate("Home");
+      this.props.navigation.navigate("DeckDetail", {deckObj: returnFormattedDeck()});
     }
   }
 

@@ -14,6 +14,7 @@ import AddNewDeckScreen from "./components/AddNewDeckScreen";
 import DeckDetailScreen from "./components/DeckDetailScreen";
 import QuizScreen from "./components/QuizScreen";
 import AddNewCardScreen from "./components/AddNewCardScreen";
+import { setLocalNotification, askNotification } from "./actions/helper";
 
 const store = createStore(
   combineReducers({
@@ -28,9 +29,11 @@ const Stack = createStackNavigator();
 
 class App extends React.Component {
   constructor(props) {
+    askNotification();
     super(props);
   }
   componentDidMount() {
+    setLocalNotification();
     store.dispatch(handleLoadInitialData());
   }
 

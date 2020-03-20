@@ -50,9 +50,15 @@ export function handleLoadInitialData() {
   };
 }
 
+let newDeck = {};
+
+export function returnFormattedDeck() {
+  return newDeck;
+}
 export function handleAddNewDeck(title, description) {
   const formattedDeck = formatDeck({ title, description });
-  console.log(formattedDeck);
+  newDeck = formattedDeck;
+  // console.log(formattedDeck);
   return dispatch => {
     return AsyncStorage.mergeItem(
       "DECKS",

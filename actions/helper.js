@@ -1,6 +1,6 @@
 import { AsyncStorage } from "react-native";
 import uuid from "react-uuid";
-import { Permissions } from "expo-permissions";
+import * as Permissions from "expo-permissions";
 import { Notifications } from "expo";
 import Constants from "expo-constants";
 
@@ -109,40 +109,57 @@ export function saveResult({ correct, total, deckId }) {
 }
 
 export function setLocalNotification() {
+  Notifications.cancelAllScheduledNotificationsAsync();
   AsyncStorage.getItem("NOTIFICATION")
     .then(JSON.parse)
     .then(data => {
       if (data === null) {
-        const { status } = async () => {
-          await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        const localNotification = {
+          title: "Remember to do Quiz today",
+          body: "Remember to do Quiz today"
         };
-        if (Constants.isDevice && status === "granted") {
-          // console.log("Notification permissions granted.");
-          Notifications.cancelAllScheduledNotificationsAsync();
-          const localNotification = {
-            title: "Remember to do Quiz today",
-            body: "Remember to do Quiz today"
-          };
-
-          const schedulingOptions = {
-            time: new Date().getTime() + 1000,
-            repeat: "day"
-          };
-
-          Notifications.scheduleLocalNotificationAsync(
-            localNotification,
-            schedulingOptions
-          );
-
-          AsyncStorage.setItem("NOTIFICATION", JSON.stringify(true));
-        }
+        let tomorrow = new Date();
+        tomorrow.setSeconds(tomorrow.getSeconds() + 5); // push notification after 3 seconds
+        const schedulingOptions = {
+          time: tomorrow
+        };
+        Notifications.scheduleLocalNotificationAsync(
+          localNotification,
+          schedulingOptions
+        );
+        AsyncStorage.setItem("NOTIFICATION", JSON.stringify(true));
       }
     });
 }
 
-const askNotification = async () => {
+export const askNotification = async () => {
   // We need to ask for Notification permissions for ios devices
   const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-  if (Constants.isDevice && status === "granted")
+  if (Constants.isDevice && status === "granted") {
     console.log("Notification permissions granted.");
+    // AsyncStorage.setItem("NOTIFICATION", JSON.stringify(true));
+  }
 };
+
+// const askNotification = async () => {
+//   // We need to ask for Notification permissions for ios devices
+//   const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+//   if (Constants.isDevice && status === 'granted') {
+//     console.log('Notification permissions granted.');
+//     Notifications.cancelAllScheduledNotificationsAsync();
+//   const localNotification = {
+//     title: "Remember to do Quiz today",
+//     body: "Remember to do Quiz today"
+//   };
+
+//   const schedulingOptions = {
+//     time: new Date().setSeconds() + 3
+//   };
+
+//   Notifications.scheduleLocalNotificationAsync(
+//     localNotification,
+//     schedulingOptions
+//   );
+//   AsyncStorage.setItem("NOTIFICATION", JSON.stringify(true));
+//   }
+// };

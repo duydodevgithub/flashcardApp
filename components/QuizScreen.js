@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, Animated } from "react-native";
+import { View, StyleSheet, SafeAreaView, Animated, Alert } from "react-native";
 import React from "react";
 import { connect } from "react-redux";
 import {
@@ -11,6 +11,9 @@ import {
 } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
 import { handleHistory } from "../actions/shared";
+import { Notifications } from "expo";
+import { setLocalNotification } from "../actions/helper";
+import { AsyncStorage } from "react-native";
 
 class QuizScreen extends React.Component {
   constructor(props) {
@@ -80,7 +83,11 @@ class QuizScreen extends React.Component {
     const { deckObj } = this.props.route.params;
     const { correct, total } = this.state;
     this.props.dispatch(handleHistory(deckObj.id, correct, total));
-    this.props.navigation.navigate("Home");
+    this.props.navigation.navigate("DeckDetail", { deckObj: deckObj });
+    Notifications.cancelAllScheduledNotificationsAsync().then(() => {
+      AsyncStorage.removeItem("NOTIFICATION");
+      setLocalNotification();
+    });
   }
 
   handleResetQuiz() {
@@ -91,6 +98,8 @@ class QuizScreen extends React.Component {
       total: deckObj.cardlist.length,
       remaining: deckObj.cardlist.length - 1
     });
+
+    this.props.navigation.navigate("DeckDetail");
   }
 
   render() {
@@ -100,7 +109,7 @@ class QuizScreen extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         {this.state.remaining >= 0 && this.state.cardArr.length > 0 ? (
-          <View>
+          <View style={{ alignItems: "center" }}>
             <Text style={{ marginTop: 100, alignContent: "center" }}>
               Remaining Questions: {this.state.remaining}
             </Text>
@@ -150,6 +159,22 @@ class QuizScreen extends React.Component {
                 />
               </View>
             </Card>
+            <Button
+              buttonStyle={{
+                borderRadius: 0,
+                margin: 10,
+                backgroundColor: "grey",
+                width: 120,
+                alignItems: "center"
+              }}
+              title="Show Answer"
+              onPress={() =>
+                Alert.alert(
+                  "Answer: ",
+                  cards[this.state.remaining].answer ? "Yex" : "No"
+                )
+              }
+            />
           </View>
         ) : (
           <View style={{ alignItems: "center", marginTop: 50 }}>
@@ -172,15 +197,18 @@ class QuizScreen extends React.Component {
                 buttonStyle={{
                   borderRadius: 0,
                   margin: 10,
-                  width: 120
+                  width: 120,
+                  height: 80
                 }}
-                title="Save Result"
+                title="Back to Deck"
                 onPress={() => this.handleSaveResult()}
               />
               <Button
                 buttonStyle={{
                   borderRadius: 0,
                   margin: 10,
+                  height: 80,
+
                   backgroundColor: "red",
                   width: 120
                 }}

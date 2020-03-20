@@ -67,7 +67,8 @@ class DeckDetailScreen extends React.Component {
               />
             </View>
           ) : (
-            <Button
+            <View style={styles.buttonHorizontal}>
+              <Button
               icon={<Icon name="alarm" color="#ffffff" />}
               buttonStyle={{
                 borderRadius: 0,
@@ -79,6 +80,18 @@ class DeckDetailScreen extends React.Component {
                 this.props.navigation.navigate("AddNewCard", { deckObj })
               }
             />
+               <Button
+                icon={<Icon name="cancel" color="#ffffff" />}
+                buttonStyle={{
+                  borderRadius: 0,
+                  margin: 5,
+                  backgroundColor: "#C07547"
+                }}
+                title="CANCEL"
+                onPress={() => this.props.navigation.navigate("Home")}
+              />
+            </View>
+            
           )}
           {/* <Button
             icon={<Icon name="remove" color="#ffffff" />}

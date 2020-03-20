@@ -9,8 +9,8 @@ import {
 import React from "react";
 import { connect } from "react-redux";
 import { Card, Button, Icon, Divider } from "react-native-elements";
-import { setLocalNotification } from "../actions/helper";
 import { Notifications } from "expo";
+import { AsyncStorage } from "react-native";
 
 const DeckItem = props => {
   // console.log(props);
@@ -18,6 +18,9 @@ const DeckItem = props => {
   return (
     <Card key={deck.id} title={deck.title}>
       <Text style={{ marginBottom: 10 }}>{deck.description}</Text>
+      <Text style={{ marginBottom: 10 }}>
+        Number of cards: {deck.cardlist.length}
+      </Text>
       <Button
         title="View Now"
         type="outline"
@@ -30,23 +33,32 @@ const DeckItem = props => {
 class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
+    // AsyncStorage.removeItem("NOTIFICATION");
+
     this.state = {
-      notification: "",
+      notification: false,
       opacity: new Animated.Value(0)
     };
     this.handleNotification = this.handleNotification.bind(this);
   }
 
   componentDidMount() {
-    setLocalNotification();
+    Notifications.cancelAllScheduledNotificationsAsync();
+    // setLocalNotification();
     const { opacity } = this.state;
     Animated.timing(opacity, { toValue: 1, duration: 2000 }).start();
   }
-
   handleNotification(listenter) {
-    this.props.dispatch({ type: "RECEIVE_HISTORY", history: {} });
+    // this.props.dispatch({ type: "RECEIVE_HISTORY", history: {} });
+    // console.log(listenter);
+    AsyncStorage.getItem("NOTIFICATION")
+      .then(JSON.parse)
+      .then(data => {
+        if (data === true) {
+          this.setState({ notification: true });
+        }
+      });
   }
-
   render() {
     const { decks, navigation } = this.props;
     Notifications.addListener(listenter => this.handleNotification(listenter));
@@ -56,14 +68,23 @@ class HomeScreen extends React.Component {
           style={[styles.notification, { opacity: this.state.opacity }]}
         >
           <Text>Notification Area</Text>
-          <Text>
+          {/* <Text>
             {this.props.history.length > 0 ? (
               <Text>You already did Quiz today !</Text>
             ) : (
               <Text>"Remember to do quiz today"</Text>
             )}
-          </Text>
+          </Text> */}
           <Divider style={{ backgroundColor: "blue" }} />
+          {this.state.notification || this.props.history.length <= 0 ? (
+            <Animated.View style={{ opacity: this.state.opacity }}>
+              <Text style={{ fontSize: 20, color: "red" }}>
+                Dont forget to do your Quiz today
+              </Text>
+            </Animated.View>
+          ) : (
+            <Text></Text>
+          )}
         </Animated.View>
         <Animated.View style={[{ opacity: this.state.opacity }]}>
           <Button
